@@ -4,9 +4,12 @@ import './App.css';
 import { API_KEY } from './dotenv';
 import Movie from './Movie';
 import Filter from './Filter';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function App() {
 	const [moviesArray, setMoviesArray] = useState([]);
+	const [filtered, setFiltered] = useState([]);
+	const [activeGenre, setActiveGenre] = useState(0);
 
 	useEffect(() => {
 		fetchPopular();
@@ -18,16 +21,24 @@ function App() {
 		);
 		const movies = await res.json();
 		setMoviesArray(movies.results);
+		setFiltered(movies.results);
 	};
 
 	return (
 		<div className="App">
-			<Filter />
-			<div className="popular-movies">
-				{moviesArray.map((movie) => {
-					return <Movie key={movie.id} movie={movie} />;
-				})}
-			</div>
+			<Filter
+				popular={moviesArray}
+				setFiltered={setFiltered}
+				activeGenre={activeGenre}
+				setActiveGenre={setActiveGenre}
+			/>
+			<motion.div layout className="popular-movies">
+				<AnimatePresence>
+					{filtered.map((movie) => {
+						return <Movie key={movie.id} movie={movie} />;
+					})}
+				</AnimatePresence>
+			</motion.div>
 		</div>
 	);
 }
